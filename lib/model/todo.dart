@@ -9,7 +9,7 @@ class Todo {
     this.isDone = false,
   });
   
-  static List<Todo> todoList() {
+  static List<Todo> getTodoList() {
     return[
       Todo(id: '3', text: 'Work on mobile apps', isDone: true),
       Todo(id: '4', text: 'Cook for dinner', isDone: true),

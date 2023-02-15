@@ -11,13 +11,13 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final todosList = Todo.todoList();
-  List<Todo> _foundTodo = [];
+  final todoList = Todo.getTodoList();
+  List<Todo> _currentTodoList = [];
   final _todoController = TextEditingController();
 
   @override
   void initState() {
-    _foundTodo = todosList;
+    _currentTodoList = todoList;
     super.initState();
   }
 
@@ -47,81 +47,23 @@ class _HomeState extends State<Home> {
                         child: const Text(
                           'All Todos',
                           style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w500,
-                            color: textPrimary
-                          ),
+                              fontSize: 30,
+                              fontWeight: FontWeight.w500,
+                              color: textPrimary),
                         ),
                       ),
-                      for (Todo todoo in _foundTodo.reversed)
+                      for (Todo currTodo in _currentTodoList)
                         TodoItem(
-                          todo: todoo,
+                          todo: currTodo,
                           onTodoChanged: _handleTodoChange,
                           onDeleteItem: _deleteTodoItem,
                         ),
                     ],
                   ),
-                )
+                ),
+                addTodo(),
               ],
             ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Row(children: [
-              Expanded(
-                child: Container(
-                  margin: const EdgeInsets.only(
-                    bottom: 20,
-                    right: 20,
-                    left: 20,
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.grey,
-                        offset: Offset(0.0, 0.0),
-                        blurRadius: 10.0,
-                        spreadRadius: 0.0,
-                      ),
-                    ],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: TextField(
-                    controller: _todoController,
-                    decoration: const InputDecoration(
-                        hintText: 'Add a new todo item',
-                        border: InputBorder.none),
-                  ),
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(
-                  bottom: 20,
-                  right: 20,
-                ),
-                child: ElevatedButton(
-                  onPressed: () {
-                    _addTodoItem(_todoController.text);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    minimumSize: const Size(60, 60),
-                    elevation: 10,
-                  ),
-                  child: const Text(
-                    '+',
-                    style: TextStyle(
-                      fontSize: 40,
-                    ),
-                  ),
-                ),
-              ),
-            ]),
           ),
         ],
       ),
@@ -136,13 +78,13 @@ class _HomeState extends State<Home> {
 
   void _deleteTodoItem(String id) {
     setState(() {
-      todosList.removeWhere((item) => item.id == id);
+      todoList.removeWhere((item) => item.id == id);
     });
   }
 
   void _addTodoItem(String toDo) {
     setState(() {
-      todosList.add(Todo(
+      todoList.add(Todo(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         text: toDo,
       ));
@@ -153,17 +95,16 @@ class _HomeState extends State<Home> {
   void _runFilter(String enteredKeyword) {
     List<Todo> results = [];
     if (enteredKeyword.isEmpty) {
-      results = todosList;
+      results = todoList;
     } else {
-      results = todosList
-          .where((item) => item.text!
-              .toLowerCase()
-              .contains(enteredKeyword.toLowerCase()))
+      results = todoList
+          .where((item) =>
+              item.text!.toLowerCase().contains(enteredKeyword.toLowerCase()))
           .toList();
     }
 
     setState(() {
-      _foundTodo = results;
+      _currentTodoList = results;
     });
   }
 
@@ -193,6 +134,63 @@ class _HomeState extends State<Home> {
         ),
       ),
     );
+  }
+
+  Widget addTodo() {
+    return Row(children: [
+      Expanded(
+        child: Container(
+          margin: const EdgeInsets.only(
+            bottom: 20,
+            right: 20,
+            left: 20,
+          ),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 5,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.grey,
+                offset: Offset(0.0, 0.0),
+                blurRadius: 10.0,
+                spreadRadius: 0.0,
+              ),
+            ],
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: TextField(
+            controller: _todoController,
+            decoration: const InputDecoration(
+                hintText: 'Add a new todo item', border: InputBorder.none),
+          ),
+        ),
+      ),
+      Container(
+        margin: const EdgeInsets.only(
+          bottom: 20,
+          right: 20,
+        ),
+        child: ElevatedButton(
+          onPressed: () {
+            _addTodoItem(_todoController.text);
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            minimumSize: const Size(60, 60),
+            elevation: 10,
+          ),
+          child: const Text(
+            '+',
+            style: TextStyle(
+              fontSize: 40,
+            ),
+          ),
+        ),
+      ),
+    ]);
   }
 
   AppBar _buildAppBar() {
